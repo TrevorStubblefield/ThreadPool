@@ -8,21 +8,33 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WorkerThread extends Thread {
 
-    Task task;
-    boolean isAvailable;
+    public Task task;
+    public volatile boolean isAvailable;
 
     public WorkerThread() {
         isAvailable = true;
         task = null;
     }
 
-    public void setTask(Task task){
-        this.task = task;
+    public synchronized void setTask(Task task){
+        try {
+            this.task = task;
+            if (task == null) {
+                wait();
+            } else {
+                notify();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public Task getTask(){return task;}
-
     public boolean isAvailable(){return isAvailable;}
+
+    public synchronized void setAvailable(boolean b){
+        isAvailable = b;
+    }
 
 
     @Override
@@ -30,10 +42,10 @@ public class WorkerThread extends Thread {
         try {
             while (true) {
                 while (task != null) {
-                    isAvailable = false;
+                    setAvailable(false);
                     task.executeTask();
-                    isAvailable = true;
-                    task = null;
+                    setAvailable(true);
+                    setTask(null);
                 }
                 Thread.sleep(1);
             }

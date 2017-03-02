@@ -39,7 +39,7 @@ public class ThreadPoolManager extends Thread{
                     thread.setTask(task);
                 }
                 else{
-                    System.out.println("null?");
+                    System.exit(-1);
                 }
             }
         }

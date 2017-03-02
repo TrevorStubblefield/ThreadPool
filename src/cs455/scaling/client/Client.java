@@ -27,11 +27,12 @@ public class Client {
         try {
             client = SocketChannel.open(new InetSocketAddress(serverIP, serverPort));
 
+            //for(int i = 0; i < 10; i++){
             while(true){
 
                 Thread.sleep(1000/messageRate);
 
-                buffer = ByteBuffer.wrap("OWEN IS GAY".getBytes());
+                buffer = ByteBuffer.wrap("Random Data".getBytes());
                 client.write(buffer);
                 buffer.clear();
                 client.read(buffer);

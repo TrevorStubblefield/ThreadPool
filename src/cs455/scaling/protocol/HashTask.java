@@ -33,9 +33,5 @@ public class HashTask implements Task {
 
     @Override
     public void executeTask(){
-
-
-
-        WriteTask
     }
 }
