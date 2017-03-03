@@ -31,17 +31,21 @@ public class ThreadPoolManager extends Thread{
 
     @Override
     public void run() {
-        while(true){
-            if(!taskQueue.isEmpty()){
-                Task task = taskQueue.poll();
-                WorkerThread thread = getAvailableThread();
-                if (thread != null){
-                    thread.setTask(task);
-                }
-                else{
-                    System.exit(-1);
+        try{
+            while(true){
+                if(!taskQueue.isEmpty()) {
+                    Task task = taskQueue.poll();
+                    WorkerThread thread;
+                    while ((thread = getAvailableThread()) == null) {
+                        Thread.sleep(5);
+                    }
+                    if (thread != null) {
+                        thread.setTask(task);
+                    } else {
+                        System.out.println("Fatal FLAW!");
+                    }
                 }
             }
-        }
+        }catch(Exception e){}
     }
 }

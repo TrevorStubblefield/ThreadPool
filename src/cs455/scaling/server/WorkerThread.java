@@ -36,7 +36,6 @@ public class WorkerThread extends Thread {
         isAvailable = b;
     }
 
-
     @Override
     public void run() {
         try {
@@ -51,6 +50,7 @@ public class WorkerThread extends Thread {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 }

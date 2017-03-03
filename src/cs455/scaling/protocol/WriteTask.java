@@ -9,11 +9,11 @@ public class WriteTask implements Task {
 
     SelectionKey key;
     SocketChannel socketChannel;
-    ByteBuffer buffer = ByteBuffer.allocate(11);
+    ByteBuffer buffer = ByteBuffer.allocate(8000);
     TaskQueue taskQueue;
     byte[] message;
 
-    public WriteTask(SelectionKey key, byte[] message,TaskQueue taskQueue){
+    public WriteTask(SelectionKey key, byte[] message, TaskQueue taskQueue){
         this.key = key;
         this.message = message;
         this.taskQueue = taskQueue;
@@ -23,15 +23,16 @@ public class WriteTask implements Task {
     @Override
     public void executeTask(){
         try {
-
-            buffer = ByteBuffer.wrap(message);
-            //buffer.flip();
-            //System.out.println(new String(buffer.array()));
-            socketChannel.write(buffer);
-            buffer.clear();
+                key.interestOps(SelectionKey.OP_READ);
+                buffer = ByteBuffer.wrap(message);
+                socketChannel.write(buffer);
+                buffer.clear();
         }
         catch(Exception e){
-            e.printStackTrace();
+            try {
+                socketChannel.close();
+            }
+            catch(Exception ex){}
         }
     }
 }

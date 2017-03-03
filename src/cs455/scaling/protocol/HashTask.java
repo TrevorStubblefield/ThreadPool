@@ -19,18 +19,6 @@ public class HashTask implements Task {
         this.taskQueue = taskQueue;
     }
 
-    public String SHA1FromBytes(byte[] data) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash = digest.digest(data);
-            BigInteger hashInt = new BigInteger(1, hash);
-            return hashInt.toString(16);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public void executeTask(){
     }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class TaskQueue {
 
-    ArrayList<Task> tasks = new ArrayList<>();
+    private ArrayList<Task> tasks = new ArrayList<>();
 
     public synchronized void add(Task task){
         tasks.add(task);
