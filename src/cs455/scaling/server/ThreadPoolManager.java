@@ -8,15 +8,12 @@ public class ThreadPoolManager extends Thread{
 
     TaskQueue taskQueue;
     ArrayList<WorkerThread> threads;
+    int threadPoolSize;
 
     public ThreadPoolManager(int threadPoolSize, TaskQueue taskQueue){
         this.taskQueue = taskQueue;
         this.threads = new ArrayList<>();
-        for (int i = 0; i < threadPoolSize; i++){
-            WorkerThread workerThread = new WorkerThread();
-            workerThread.start();
-            this.threads.add(workerThread);
-        }
+        this.threadPoolSize = threadPoolSize;
     }
 
     public WorkerThread getAvailableThread(){
@@ -29,6 +26,14 @@ public class ThreadPoolManager extends Thread{
         return null;
     }
 
+    public void startThreads(){
+        for (int i = 0; i < threadPoolSize; i++){
+            WorkerThread workerThread = new WorkerThread(taskQueue);
+            workerThread.start();
+            this.threads.add(workerThread);
+        }
+    }
+
     @Override
     public void run() {
         try{
@@ -37,7 +42,7 @@ public class ThreadPoolManager extends Thread{
                     Task task = taskQueue.poll();
                     WorkerThread thread;
                     while ((thread = getAvailableThread()) == null) {
-                        Thread.sleep(5);
+                        Thread.sleep(1);
                     }
                     if (thread != null) {
                         thread.setTask(task);

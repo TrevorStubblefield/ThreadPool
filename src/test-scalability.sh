@@ -22,7 +22,7 @@ COMMENT
 
 CLASSES=/s/bach/d/under/tstubb/IdeaProjects/ThreadPool/src
 SCRIPT="cd $CLASSES;
-java -cp . cs455.scaling.client.Client 129.82.44.145 1235 2"
+java -cp . cs455.scaling.client.Client 100.65.11.228 1235 2"
 
 #$1 is the command-line argument
 for ((j=1; j<=$1; j++));

@@ -9,17 +9,24 @@ public class TaskQueue {
     private ArrayList<Task> tasks = new ArrayList<>();
 
     public synchronized void add(Task task){
-        tasks.add(task);
+        try {
+            tasks.add(task);
+            notify();
+        }
+        catch(Exception e){}
     }
 
     public synchronized Task poll(){
-        Task task;
+        try {
+            Task task;
 
-        if(tasks.size() > 0){
+            while (tasks.size() < 1) {wait(10);}
+
             task = tasks.get(0);
             tasks.remove(0);
             return task;
         }
+        catch(Exception e){}
         return null;
     }
 

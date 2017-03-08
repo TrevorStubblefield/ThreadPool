@@ -10,10 +10,12 @@ public class WorkerThread extends Thread {
 
     public Task task;
     public volatile boolean isAvailable;
+    TaskQueue queue;
 
-    public WorkerThread() {
+    public WorkerThread(TaskQueue queue) {
         isAvailable = true;
         task = null;
+        this.queue = queue;
     }
 
     public synchronized void setTask(Task task){
@@ -39,15 +41,24 @@ public class WorkerThread extends Thread {
     @Override
     public void run() {
         try {
-            while (true) {
-                while (task != null) {
-                    setAvailable(false);
+//            while (true) {
+//                while (task != null) {
+//                    setAvailable(false);
+//                    task.executeTask();
+//                    setAvailable(true);
+//                    setTask(null);
+//                }
+//                Thread.sleep(1);
+//            }
+
+            while(true){
+                task = queue.poll();
+                if(task != null){
                     task.executeTask();
-                    setAvailable(true);
-                    setTask(null);
+                    task = null;
                 }
-                Thread.sleep(1);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

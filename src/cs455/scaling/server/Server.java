@@ -25,7 +25,8 @@ public class Server {
         int port = Integer.parseInt(args[0]);
         int threadPoolSize = Integer.parseInt(args[1]);
 
-        new ThreadPoolManager(threadPoolSize,taskQueue).start();
+        ThreadPoolManager threadPoolManager = new ThreadPoolManager(threadPoolSize,taskQueue);
+        threadPoolManager.startThreads();
 
         try {
 

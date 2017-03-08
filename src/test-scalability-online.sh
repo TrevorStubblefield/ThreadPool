@@ -21,9 +21,9 @@ How it works:
 - If you want to close Client processes, please refer 'stop-clients.sh' and use it carefully as it kills all java processes.
 COMMENT
 
-CLASSES=<project_root_directory>
+CLASSES=/s/bach/d/under/tstubb/IdeaProjects/ThreadPool/src
 SCRIPT="cd $CLASSES;
-java -cp . cs455.scaling.client.Client [server-host] [server-listening-port] > "
+java -cp . cs455.scaling.client.Client 100.65.11.228 1235 2 > "
 
 #$1 is the command-line argument
 for ((j=1; j<=$1; j++));
