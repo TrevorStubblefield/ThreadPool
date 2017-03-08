@@ -1,5 +1,6 @@
 package cs455.scaling.protocol;
 
+import cs455.scaling.server.Server;
 import cs455.scaling.server.TaskQueue;
 
 import java.nio.ByteBuffer;
@@ -23,7 +24,7 @@ public class WriteTask implements Task {
     @Override
     public void executeTask(){
         try {
-                key.interestOps(SelectionKey.OP_READ);
+                Server.serverStatisticsWrapper.incrementSent();
                 buffer = ByteBuffer.wrap(message);
                 socketChannel.write(buffer);
                 buffer.clear();

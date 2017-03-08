@@ -6,10 +6,12 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 public class ReadTask implements Task {
 
     ByteBuffer buffer = ByteBuffer.allocate(8000);
+    ByteBuffer incoming = ByteBuffer.allocate(8000);
     SelectionKey key;
     SocketChannel socketChannel;
     TaskQueue taskQueue;
@@ -35,10 +37,45 @@ public class ReadTask implements Task {
     @Override
     public void executeTask(){
         try {
-            socketChannel.read(buffer);
-            byte[] messageHash = SHA1FromBytes(buffer.array()).getBytes();
-            WriteTask task = new WriteTask(key,messageHash,taskQueue);
-            taskQueue.add(task);
+            int totalLength = 0;
+            int incomingLength;
+            byte[] totalBytes;
+            byte[] attachment = (byte[])key.attachment();
+
+            incomingLength = socketChannel.read(incoming);
+            byte[] incomingBytes = new byte[incomingLength];
+            for(int i = 0; i < incomingLength; i++){
+                incomingBytes[i] = incoming.array()[i];
+            }
+            totalLength+=incomingLength;
+
+
+            if(attachment != null) {
+                int aLen = attachment.length;
+                int bLen = incomingBytes.length;
+                totalBytes= new byte[aLen+bLen];
+                System.arraycopy(attachment, 0, totalBytes, 0, aLen);
+                System.arraycopy(incomingBytes, 0, totalBytes, aLen, bLen);
+                totalLength+=attachment.length;
+            }
+            else{
+                totalBytes = incomingBytes;
+            }
+
+            if (totalLength < 8000){
+                key.attach(totalBytes);
+            }
+            else {
+                key.attach(null);
+                byte[] messageHash = SHA1FromBytes(totalBytes).getBytes();
+                String davis = new String(totalBytes);
+//                for(int i = 0; i < totalBytes.length;i++){
+//                    System.out.print(totalBytes[i] + " ");
+//                }
+//                System.out.println();
+                WriteTask task = new WriteTask(key, messageHash, taskQueue);
+                taskQueue.add(task);
+            }
             key.interestOps(SelectionKey.OP_READ);
         }
         catch(Exception e){}

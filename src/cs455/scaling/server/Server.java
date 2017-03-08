@@ -4,7 +4,6 @@ import cs455.scaling.protocol.*;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Timer;
@@ -13,13 +12,9 @@ import java.util.TimerTask;
 
 public class Server {
 
-    static volatile int numMessages;
-    static volatile int numConnections;
+    public static ServerStatisticsWrapper serverStatisticsWrapper = new ServerStatisticsWrapper();
 
     public static void main (String [] args){
-
-        numMessages = 0;
-        numConnections =0;
 
         Timer timer = new Timer();
         timer.schedule(new ServerMessageOutput(), 0, 5000);
@@ -51,14 +46,13 @@ public class Server {
 
                     if(key.isAcceptable()){
                         SocketChannel socketChannel = serverSocketChannel.accept();
-                        numConnections++;
+                        serverStatisticsWrapper.incrementConnections();
                         socketChannel.configureBlocking(false);
                         socketChannel.register(selector,SelectionKey.OP_READ);
                     }
                     if(key.isReadable()){
                         ReadTask task = new ReadTask(key,taskQueue);
                         taskQueue.add(task);
-                        numMessages++;
                         key.interestOps(SelectionKey.OP_WRITE);
 
                     }
@@ -79,7 +73,7 @@ class ServerMessageOutput extends TimerTask {
 
     @Override
     public void run(){
-        System.out.println("["+System.nanoTime()+"] Current Server Throughput: " + Server.numMessages/5 + " messages/s, Active Client Connections: "  + Server.numConnections);
-        Server.numMessages = 0;
+        Server.serverStatisticsWrapper.printOutput();
+        Server.serverStatisticsWrapper.resetMessages();
     }
 }

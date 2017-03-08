@@ -9,8 +9,7 @@ import java.util.*;
 
 public class Client {
 
-    static volatile int totalSent;
-    static volatile int totalReceived;
+    public static ClientStatisticsWrapper clientStatisticsWrapper = new ClientStatisticsWrapper();
 
     static LinkedList<String> hashedMessages = new LinkedList<>();
 
@@ -30,15 +29,14 @@ public class Client {
         byte[] bytes = new byte[8000];
         Random random = new Random();
         for (int i = 0; i < bytes.length; i++){
-            bytes[i] = (byte)random.nextInt(128);
+            // random calculated by (max - min) + 1) + min.
+            bytes[i] = (byte)(random.nextInt((128+127)+1)-127);
+            //bytes[i] = 'a';
         }
         return bytes;
     }
 
     public static void main (String [] args){
-
-        totalSent = 0;
-        totalReceived = 0;
 
         SocketChannel socketChannel;
         ByteBuffer buffer;
@@ -54,14 +52,14 @@ public class Client {
             timer.schedule(new ClientMessageOutput(), 0, 10000);
 
             while(true){
-
+            //for(int i = 0;i < 2;i++){
                 byte[] sentMessage = generateMessage();
                 String hashedSentMessage = SHA1FromBytes(sentMessage);
                 hashedMessages.add(hashedSentMessage);
 
                 buffer = ByteBuffer.wrap(sentMessage);
                 socketChannel.write(buffer);
-                totalSent++;
+                clientStatisticsWrapper.incrementSent();
                 buffer.clear();
 
                 Thread.sleep(1000/messageRate);
@@ -70,16 +68,18 @@ public class Client {
                     @Override
                     public void run(){
                         try {
-                            ByteBuffer buffer2 = ByteBuffer.allocate(8000);
-                            int length = socketChannel.read(buffer2);
-                            totalReceived++;
-                            String receivedMessage = new String(Arrays.copyOfRange(buffer2.array(), 0, length));
-                            if (hashedMessages.contains(receivedMessage)) {
-                                hashedMessages.remove(receivedMessage);
-                            } else {
-                                System.out.println(receivedMessage);
+                            while(true) {
+                                ByteBuffer buffer2 = ByteBuffer.allocate(8000);
+                                int length = socketChannel.read(buffer2);
+                                String receivedMessage = new String(Arrays.copyOfRange(buffer2.array(), 0, length));
+                                if (hashedMessages.contains(receivedMessage)) {
+                                    hashedMessages.remove(receivedMessage);
+                                    clientStatisticsWrapper.incrementReceived();
+                                } else {
+                                    System.out.println("failed! " + receivedMessage);
+                                }
+                                buffer2.clear();
                             }
-                            buffer2.clear();
                         }
                         catch(Exception e){}
                     }
@@ -99,8 +99,7 @@ class ClientMessageOutput extends TimerTask {
 
     @Override
     public void run(){
-        System.out.println("[" + System.nanoTime() + "] Total Sent Count: " + Client.totalSent + ", Total Received Count: " + Client.totalReceived);
-        Client.totalSent = 0;
-        Client.totalReceived = 0;
+        Client.clientStatisticsWrapper.printOutput();
+        Client.clientStatisticsWrapper.resetMessages();
     }
 }
