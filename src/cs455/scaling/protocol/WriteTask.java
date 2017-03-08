@@ -24,16 +24,10 @@ public class WriteTask implements Task {
     @Override
     public void executeTask(){
         try {
-                Server.serverStatisticsWrapper.incrementSent();
                 buffer = ByteBuffer.wrap(message);
                 socketChannel.write(buffer);
-                buffer.clear();
+                Server.serverStatisticsWrapper.incrementSent();
         }
-        catch(Exception e){
-            try {
-                socketChannel.close();
-            }
-            catch(Exception ex){}
-        }
+        catch(Exception e){}
     }
 }

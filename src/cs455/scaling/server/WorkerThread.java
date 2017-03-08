@@ -41,16 +41,6 @@ public class WorkerThread extends Thread {
     @Override
     public void run() {
         try {
-//            while (true) {
-//                while (task != null) {
-//                    setAvailable(false);
-//                    task.executeTask();
-//                    setAvailable(true);
-//                    setTask(null);
-//                }
-//                Thread.sleep(1);
-//            }
-
             while(true){
                 task = queue.poll();
                 if(task != null){
@@ -58,7 +48,6 @@ public class WorkerThread extends Thread {
                     task = null;
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

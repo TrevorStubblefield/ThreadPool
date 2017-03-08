@@ -17,5 +17,5 @@ all: classes
 classes: $(CLASSES:.java=.class)
 
 clean:
-	$(RM) ${PACKAGE2}*.class ${PACKAGE}*.class
+	$(RM) ${PACKAGE2}*.class ${PACKAGE}*.class ${PACKAGE3}*.class
 

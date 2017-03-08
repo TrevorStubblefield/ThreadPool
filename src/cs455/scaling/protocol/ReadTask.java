@@ -68,11 +68,6 @@ public class ReadTask implements Task {
             else {
                 key.attach(null);
                 byte[] messageHash = SHA1FromBytes(totalBytes).getBytes();
-                String davis = new String(totalBytes);
-//                for(int i = 0; i < totalBytes.length;i++){
-//                    System.out.print(totalBytes[i] + " ");
-//                }
-//                System.out.println();
                 WriteTask task = new WriteTask(key, messageHash, taskQueue);
                 taskQueue.add(task);
             }

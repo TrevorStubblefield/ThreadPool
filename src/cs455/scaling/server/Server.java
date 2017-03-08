@@ -52,14 +52,13 @@ public class Server {
                         socketChannel.register(selector,SelectionKey.OP_READ);
                     }
                     if(key.isReadable()){
+                        key.interestOps(SelectionKey.OP_WRITE);
                         ReadTask task = new ReadTask(key,taskQueue);
                         taskQueue.add(task);
-                        key.interestOps(SelectionKey.OP_WRITE);
 
                     }
 
                     iterator.remove();
-                    selector.selectedKeys().remove(key);
                 }
             }
         }
